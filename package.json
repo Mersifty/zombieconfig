@@ -1,0 +1,49 @@
+{
+  "name": "zombieconfig",
+  "version": "1.0.0",
+  "description": "Zero-config multi-language Zombie Env & Ghost Variable Hunter for developers and CI/CD",
+  "main": "dist/index.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mersifty/zombieconfig.git"
+  },
+  "bin": {
+    "zombieconfig": "./bin/ghostconfig.js",
+    "zombie": "./bin/ghostconfig.js",
+    "ghostconfig": "./bin/ghostconfig.js",
+    "ghost": "./bin/ghostconfig.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/cli.ts",
+    "test": "tsx --test tests/**/*.test.ts",
+    "scan": "node ./bin/ghostconfig.js scan",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "env",
+    "environment-variables",
+    "ghost-variables",
+    "zombie-env",
+    "developer-tools",
+    "cli",
+    "tui",
+    "audit",
+    "security",
+    "dotenv"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1",
+    "dotenv": "^16.4.7",
+    "fast-glob": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2"
+  }
+}
