@@ -162,4 +162,4 @@ npm run test
 ```
 
 ## 📄 License
-MIT © Antigravity
+MIT © Mersifty

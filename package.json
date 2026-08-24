@@ -33,7 +33,7 @@
     "security",
     "dotenv"
   ],
-  "author": "Antigravity",
+  "author": "Mersifty",
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0",
