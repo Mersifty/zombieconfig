@@ -1,91 +1,113 @@
 # 🧟‍♂️ ZombieConfig
 
-> **Zero-Config, Multi-Language Zombie Environment & Config Variable Hunter for Developers and CI/CD Pipelines.**
+<p align="center">
+  <strong>Zero-Config, Blazing-Fast Zombie Environment & Config Variable Hunter</strong><br>
+  <em>Audit dead env vars, missing .env.example keys, type traps & secret leaks across any codebase in milliseconds.</em>
+</p>
 
-[![Node.js](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/typescript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-**GhostConfig** audits your codebase to detect dead (zombie) config variables, missing `.env.example` keys, dangerous JavaScript type traps (e.g. `ENABLE_FEATURE="false"` evaluated as truthy), and committed secret leaks across **JavaScript, TypeScript, Python, Go, Rust, PHP, Ruby, Java, C#, Docker, and GitHub Actions**.
+<p align="center">
+  <a href="https://github.com/Mersifty/zombieconfig/actions"><img src="https://img.shields.io/badge/CI-Passing-brightgreen?style=flat-square" alt="CI Status" /></a>
+  <a href="https://www.npmjs.com/package/zombieconfig"><img src="https://img.shields.io/npm/v/zombieconfig.svg?style=flat-square&color=cb3837" alt="npm version" /></a>
+  <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg?style=flat-square" alt="Node.js" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-blue.svg?style=flat-square" alt="TypeScript" /></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License: MIT" /></a>
+</p>
 
 ---
 
-## ⚡ Key Features
+## 🧐 Why ZombieConfig?
 
-* 🧟‍♂️ **Zombie Variable Detection:** Finds variables defined in `.env`, `.env.local`, `docker-compose.yml`, or K8s configs that are **never referenced in code**.
-* 🚨 **Missing & Undocumented Keys:** Flags environment variables referenced in your code that are absent from `.env.example` or active `.env`.
-* ⚠️ **Boolean & Type Trap Hazards:** Catches logic traps like `if (process.env.DEBUG)` when `.env` contains `"false"` (which evaluates to truthy in JS!).
-* 🔓 **Secret Leak Scanner:** High-entropy and pattern scanner preventing accidental credential leaks (AWS, OpenAI, Stripe, JWT, Private Keys) in `.env.example` templates.
-* 🛠️ **Auto-Fixers:**
-  - `ghostconfig fix --sync-example`: Automatically syncs `.env.example` with safe placeholder comments.
-  - `ghostconfig fix --prune`: Safely comments out or removes zombie keys from `.env`.
-* 📐 **Schema Generator:**
-  - `ghostconfig generate --schema zod`: Generates type-safe Zod validation schemas.
-  - `ghostconfig generate --schema ts`: Generates TypeScript `env.d.ts` definitions.
-* 🤖 **CI/CD Integration:** Supports `--ci`, `--strict`, and `--format json` with proper exit codes for GitHub Actions, GitLab CI, and Docker builds.
+In fast-moving teams, `.env` files inevitably become a **graveyard of forgotten configurations**:
+
+1. **🧟 Zombie / Ghost Variables:** Features get deleted from code, but their corresponding API keys and config values remain in `.env` and `docker-compose.yml` for months because nobody dares to touch them.
+2. **🚨 Broken Onboarding (Missing Keys):** A developer adds `process.env.NEW_SECRET` in code but forgets to update `.env.example`. New teammates clone the repo and spend hours debugging unexpected startup crashes.
+3. **⚠️ The Infamous JavaScript "Type Trap":** Setting `ENABLE_BETA="false"` in `.env` causes `if (process.env.ENABLE_BETA)` to evaluate to **`true`** because in JavaScript, non-empty strings are always truthy!
+4. **🔓 Leaked Secrets in Templates:** Real OpenAI, AWS, or Stripe tokens mistakenly committed into `.env.example` or public repositories.
+
+**ZombieConfig** solves all of these with **zero configuration** and instant auto-fixers.
+
+---
+
+## ⚡ Key Highlights
+
+* 🔍 **Multi-Language AST Scanner:** Scans JavaScript, TypeScript, Python, Go, Rust, PHP, Ruby, Java, C#, Dockerfile, and GitHub Actions YAML.
+* 🧟‍♂️ **Ghost Detection:** Pinpoints variables defined in config that are never read anywhere in code.
+* 🚨 **Missing Key Auditing:** Identifies undocumented environment variables and suggests safe default values.
+* ⚠️ **Logic & Type Trap Warnings:** Catches boolean string hazards (`"false"` truthy bug) and numeric NaN pitfalls.
+* 🔓 **Secret Leak Prevention:** High-entropy and pattern detection for leaked tokens (AWS, OpenAI, Anthropic, Stripe, JWT, Private Keys).
+* 🛠️ **One-Command Auto-Fixers:**
+  - `zombieconfig fix --sync-example`: Automatically creates or updates `.env.example`.
+  - `zombieconfig fix --prune`: Safely archives/comments out dead zombie keys from `.env`.
+* 📐 **Schema Generator:** Auto-generates type-safe **Zod** schemas or TypeScript `env.d.ts` declarations directly from your project's variables.
+* 🤖 **CI/CD Ready:** Exit-code support and `--format json` for automated pull request checks in GitHub Actions and GitLab CI.
 
 ---
 
 ## 🚀 Quick Start
 
-### Run directly with `npx`:
+Run instantly with **`npx`** (no installation required):
+
 ```bash
-npx ghostconfig scan
+npx zombieconfig
 ```
 
-### Install globally:
+Or install globally via npm:
+
 ```bash
-npm install -g ghostconfig
-ghostconfig scan
+npm install -g zombieconfig
+zombieconfig
 ```
 
 ---
 
-## 💻 CLI Usage
+## 💻 CLI Commands & Options
 
-### 1. Audit / Scan
+### 1. Audit & Scan
 ```bash
-# Scan current project
-ghostconfig scan
+# Scan current repository
+zombieconfig scan
 
 # Scan a specific directory
-ghostconfig scan -d ./my-project
+zombieconfig scan -d ./packages/backend
 
-# Output machine-readable JSON for CI/CD
-ghostconfig scan --format json
+# Output machine-readable JSON for CI/CD pipelines
+zombieconfig scan --format json
 
-# Enforce strict CI check (fails on any zombie or missing var)
-ghostconfig scan --ci --strict --min-score 85
+# Enforce strict CI check (fails if health score < 85 or critical issues exist)
+zombieconfig scan --ci --strict --min-score 85
 ```
 
-### 2. Auto-Fix Issues
+### 2. Auto-Fix
 ```bash
 # Automatically update .env.example with missing variables
-ghostconfig fix --sync-example
+zombieconfig fix --sync-example
 
 # Safely archive zombie variables in .env (comments them out)
-ghostconfig fix --prune
+zombieconfig fix --prune
 
-# Run all automated fixes
-ghostconfig fix --all
+# Permanently delete dead zombie lines instead of commenting out
+zombieconfig fix --prune --remove
+
+# Perform all fixes at once
+zombieconfig fix --all
 ```
 
 ### 3. Generate Type-Safe Schemas
 ```bash
-# Generate Zod schema
-ghostconfig generate --schema zod --out src/env.ts
+# Generate a type-safe Zod validation schema
+zombieconfig generate --schema zod --out src/env.ts
 
-# Generate TypeScript declarations
-ghostconfig generate --schema ts --out types/env.d.ts
+# Generate TypeScript ambient declarations
+zombieconfig generate --schema ts --out types/env.d.ts
 ```
 
 ---
 
-## 🌐 Supported Languages & Frameworks
+## 🌐 Supported Languages & Patterns
 
-| Language / Tool | Detected Patterns |
-|-----------------|-------------------|
-| **JavaScript / TypeScript** | `process.env.VAR`, `process.env['VAR']`, `import.meta.env.VAR`, Destructuring `const { VAR } = process.env` |
+| Language / Framework | Detected Patterns |
+|----------------------|-------------------|
+| **JavaScript / TypeScript** | `process.env.VAR`, `process.env['VAR']`, `import.meta.env.VAR`, `const { VAR } = process.env` |
 | **Python** | `os.getenv("VAR")`, `os.environ["VAR"]`, `os.environ.get("VAR")`, `config("VAR")` |
 | **Go** | `os.Getenv("VAR")`, `os.LookupEnv("VAR")` |
 | **Rust** | `std::env::var("VAR")`, `env::var("VAR")`, `dotenv!("VAR")`, `env!("VAR")` |
@@ -93,73 +115,67 @@ ghostconfig generate --schema ts --out types/env.d.ts
 | **Ruby** | `ENV['VAR']`, `ENV.fetch('VAR')` |
 | **Java / Kotlin** | `System.getenv("VAR")` |
 | **C# / .NET** | `Environment.GetEnvironmentVariable("VAR")` |
-| **Docker / Compose** | `docker-compose.yml`, `Dockerfile` `ENV`/`ARG` |
-| **CI / CD** | GitHub Actions `${{ env.VAR }}`, `${{ secrets.VAR }}` |
+| **Docker** | `docker-compose.yml`, `compose.yaml`, `Dockerfile` `ENV`/`ARG` |
+| **GitHub Actions** | `${{ env.VAR }}`, `${{ secrets.VAR }}` |
 
 ---
 
-## 📊 Sample Terminal Output
+## 🤖 GitHub Actions CI Workflow
 
-```
-   ____  _               _    ____             __ _       
-  / ___|| |__   ___  ___| |_ / ___|___  _ __  / _(_) __ _ 
- | |  _ | '_ \ / _ \/ __| __| |   / _ \| '_ \| |_| |/ _` |
- | |_| || | | | (_) \__ \ |_| |__| (_) | | | |  _| | (_| |
-  \____||_| |_|\___/|___/\__|\____\___/|_| |_|_| |_|\__, |
-                                                     |___/ 
-  Zero-Config Zombie Env & Config Auditor v1.0.0
+Add this to `.github/workflows/env-check.yml` to prevent broken `.env.example` files in pull requests:
 
-📊 AUDIT SUMMARY
-   Health Score : ████████████░░░░░░░░ 60/100
-   Code Files   : 14 scanned
-   Env Files    : 2 scanned (.env, .env.example)
-   Variables    : 18 defined | 22 references
-   Audit Time   : 32ms
+```yaml
+name: Environment Health Audit
 
- ⚠️ TYPE TRAPS & LOGIC HAZARDS 
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
-  ● ENABLE_FEATURE (boolean_string_trap)
-    Env Config : false in .env:6
-    Code Usage : "if (process.env.ENABLE_FEATURE)" in src/server.ts:12
-    Hazard     : Variable is set to "false", but tested as truthy boolean. In JS, "false" string is truthy!
-    Fix        : Use process.env.ENABLE_FEATURE === 'true' or validate with Zod.
+jobs:
+  env-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-🚨 MISSING / UNDOCUMENTED VARIABLES
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-  ● STRIPE_SECRET_KEY [Missing in .env.example]
-    Suggested Default: your_stripe_secret_key_here
-    Referenced In:
-      - src/services/billing.ts:8 ("const key = process.env.STRIPE_SECRET_KEY")
-
-🧟 ZOMBIE / GHOST VARIABLES (Defined in config, never used in code)
-
-  ● OLD_LEGACY_TOKEN = "xyz_123" [Dead - Can be pruned]
-    Found in: .env (line 14)
+      - name: Audit Environment with ZombieConfig
+        run: npx zombieconfig scan --ci --strict --min-score 80
 ```
 
 ---
 
 ## 🛠️ Programmatic API
 
-GhostConfig can also be used as a TypeScript library:
+You can also use ZombieConfig as a TypeScript library in your build scripts:
 
 ```typescript
-import { runAudit, generateZodSchema } from 'ghostconfig';
+import { runAudit, generateZodSchema } from 'zombieconfig';
 
-const result = await runAudit({ cwd: './' });
+const result = await runAudit({ cwd: process.cwd() });
 
-console.log(`Health Score: ${result.healthScore}/100`);
+console.log(`Project Health Score: ${result.healthScore}/100`);
 console.log(`Zombie Variables: ${result.zombies.length}`);
 console.log(`Missing Variables: ${result.missing.length}`);
+console.log(`Type Traps Found: ${result.typeTraps.length}`);
 ```
 
 ---
 
-## 🧪 Testing
+## 🧪 Running Tests
 
 ```bash
 npm run test
 ```
 
+---
+
 ## 📄 License
-MIT © Mersifty
+
+MIT © [Mersifty](https://github.com/Mersifty)
