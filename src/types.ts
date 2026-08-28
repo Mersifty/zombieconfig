@@ -11,6 +11,9 @@ export type SupportedLanguage =
   | 'shell'
   | 'docker'
   | 'yaml'
+  | 'elixir'
+  | 'swift'
+  | 'terraform'
   | 'other';
 
 export interface EnvVariableDefinition {
@@ -68,6 +71,39 @@ export interface SecretLeakIssue {
   severity: 'critical' | 'high' | 'medium';
 }
 
+// v2.0 — New Issue Types
+
+export interface DuplicateIssue {
+  name: string;
+  definitions: {
+    file: string;
+    line: number;
+    value: string;
+  }[];
+  hasDifferentValues: boolean;
+}
+
+export interface ValueValidationIssue {
+  name: string;
+  value: string;
+  file: string;
+  line: number;
+  rule: 'invalid_url' | 'invalid_port' | 'empty_required' | 'invalid_email' | 'suspicious_placeholder';
+  description: string;
+  suggestion: string;
+}
+
+export interface DeprecationIssue {
+  name: string;
+  file: string;
+  line: number;
+  framework: string;
+  replacement: string;
+  description: string;
+}
+
+export type HealthGrade = 'A+' | 'A' | 'B' | 'C' | 'D' | 'F';
+
 export interface AuditResult {
   rootDirectory: string;
   scannedEnvFiles: string[];
@@ -78,7 +114,11 @@ export interface AuditResult {
   missing: MissingIssue[];
   typeTraps: TypeTrapIssue[];
   secretLeaks: SecretLeakIssue[];
+  duplicates: DuplicateIssue[];
+  valueIssues: ValueValidationIssue[];
+  deprecations: DeprecationIssue[];
   healthScore: number; // 0 - 100
+  healthGrade: HealthGrade;
   executionTimeMs: number;
 }
 
@@ -91,4 +131,21 @@ export interface ScanOptions {
   fix?: boolean;
   ci?: boolean;
   format?: 'pretty' | 'json' | 'markdown';
+}
+
+// Project config file (.zombieconfigrc.json)
+export interface ZombieConfigRC {
+  minScore?: number;
+  ignore?: string[];
+  include?: string[];
+  exclude?: string[];
+  envPatterns?: string[];
+  rules?: {
+    noSecrets?: boolean;
+    requireExample?: boolean;
+    noDuplicates?: boolean;
+    validateValues?: boolean;
+    checkDeprecations?: boolean;
+    maxZombies?: number;
+  };
 }

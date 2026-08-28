@@ -17,6 +17,11 @@ const CODE_EXTENSIONS = [
   '**/*.bash',
   '**/*.zsh',
   '**/*.ps1',
+  '**/*.ex',
+  '**/*.exs',
+  '**/*.swift',
+  '**/*.tf',
+  '**/*.tfvars',
   '**/Dockerfile*',
   '**/*.dockerfile',
   '**/.github/**/*.yml',
@@ -54,6 +59,9 @@ function getLanguage(filePath: string): SupportedLanguage {
   if (['.java', '.kt'].includes(ext)) return 'java';
   if (ext === '.cs') return 'csharp';
   if (['.sh', '.bash', '.zsh', '.ps1'].includes(ext)) return 'shell';
+  if (['.ex', '.exs'].includes(ext)) return 'elixir';
+  if (ext === '.swift') return 'swift';
+  if (['.tf', '.tfvars'].includes(ext)) return 'terraform';
   if (base.includes('dockerfile')) return 'docker';
   if (['.yml', '.yaml'].includes(ext)) return 'yaml';
   return 'other';
@@ -168,6 +176,34 @@ const PATTERNS: PatternMatcher[] = [
     nameGroup: 1,
     patternType: 'Environment.GetEnvironmentVariable("VAR")',
   },
+  // Elixir: System.get_env("VAR") or System.fetch_env("VAR") or System.fetch_env!("VAR")
+  {
+    regex: /System\.(?:get_env|fetch_env!?)\s*\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*\)/g,
+    language: 'elixir',
+    nameGroup: 1,
+    patternType: 'System.get_env("VAR")',
+  },
+  // Swift: ProcessInfo.processInfo.environment["VAR"]
+  {
+    regex: /ProcessInfo\.processInfo\.environment\s*\[\s*["']([A-Za-z_][A-Za-z0-9_]*)["']\s*\]/g,
+    language: 'swift',
+    nameGroup: 1,
+    patternType: 'ProcessInfo.processInfo.environment["VAR"]',
+  },
+  // Terraform: var.VAR_NAME or variable "VAR_NAME"
+  {
+    regex: /(?:var\.([A-Za-z_][A-Za-z0-9_]*)|variable\s+"([A-Za-z_][A-Za-z0-9_]*)")/g,
+    language: 'terraform',
+    nameGroup: 1,
+    patternType: 'var.VAR',
+  },
+  // Dockerfile: ENV VAR_NAME=value or ENV VAR_NAME value or ARG VAR_NAME
+  {
+    regex: /^\s*(?:ENV|ARG)\s+([A-Za-z_][A-Za-z0-9_]*)(?:=|\s)/gm,
+    language: 'docker',
+    nameGroup: 1,
+    patternType: 'ENV/ARG VAR',
+  },
   // GitHub Actions: ${{ env.VAR }} or ${{ secrets.VAR }}
   {
     regex: /\$\{\{\s*(?:env|secrets)\.([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g,
@@ -241,16 +277,15 @@ export async function scanCodeFile(filePath: string): Promise<CodeEnvUsage[]> {
       pattern.regex.lastIndex = 0;
       let match;
       while ((match = pattern.regex.exec(lineText)) !== null) {
-        const varName = match[pattern.nameGroup];
+        const varName = match[pattern.nameGroup] || match[2];
         if (!varName) continue;
 
         // Skip internal/standard non-env matches (like NODE_ENV is fine, but filter out methods/properties)
-        if (['prototype', 'length', 'name', 'constructor'].includes(varName)) continue;
+        if (['prototype', 'length', 'name', 'constructor', 'default', 'toString'].includes(varName)) continue;
 
         // Check if there is a potential Boolean type trap (e.g. if (process.env.VAR) or !process.env.VAR or Boolean(process.env.VAR))
         const isBoolTrap =
           (lineText.includes(`if (${match[0]}`) ||
-            lineText.includes(`if (${match[0]}`) ||
             lineText.includes(`!${match[0]}`) ||
             lineText.includes(`Boolean(${match[0]})`) ||
             lineText.includes(`${match[0]} ?`)) &&

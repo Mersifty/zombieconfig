@@ -1,9 +1,13 @@
 {
   "name": "zombieconfig",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Zero-config multi-language Zombie Env & Ghost Variable Hunter for developers and CI/CD",
   "main": "dist/index.js",
   "type": "module",
+  "homepage": "https://github.com/Mersifty/zombieconfig#readme",
+  "bugs": {
+    "url": "https://github.com/Mersifty/zombieconfig/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mersifty/zombieconfig.git"
@@ -14,11 +18,21 @@
     "ghostconfig": "./bin/ghostconfig.js",
     "ghost": "./bin/ghostconfig.js"
   },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "start": "tsx src/cli.ts",
     "test": "tsx --test tests/*.test.ts",
     "scan": "node ./bin/ghostconfig.js scan",
+    "doctor": "node ./bin/ghostconfig.js doctor",
     "lint": "tsc --noEmit"
   },
   "keywords": [
@@ -31,19 +45,25 @@
     "tui",
     "audit",
     "security",
-    "dotenv"
+    "dotenv",
+    "diff",
+    "doctor",
+    "zod-generator",
+    "type-safety",
+    "secret-scanner",
+    "devops"
   ],
   "author": "Mersifty",
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0",
-    "picocolors": "^1.1.1",
     "dotenv": "^16.4.7",
-    "fast-glob": "^3.3.3"
+    "fast-glob": "^3.3.3",
+    "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
-    "typescript": "^5.7.2",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }

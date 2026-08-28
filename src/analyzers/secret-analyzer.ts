@@ -23,8 +23,8 @@ const SECRET_RULES: SecretRule[] = [
     severity: 'critical',
   },
   {
-    name: 'Google API Key',
-    regex: /\b(AIzaSy[a-zA-Z0-9_-]{33})\b/,
+    name: 'Google / Firebase API Key',
+    regex: /\b(AIza[0-9A-Za-z-_]{35})\b/,
     severity: 'critical',
   },
   {
@@ -38,9 +38,29 @@ const SECRET_RULES: SecretRule[] = [
     severity: 'critical',
   },
   {
-    name: 'Stripe Live Secret Key',
+    name: 'Stripe Secret Key',
     regex: /\b(sk_live_[0-9a-zA-Z]{24,}|rk_live_[0-9a-zA-Z]{24,})\b/,
     severity: 'critical',
+  },
+  {
+    name: 'SendGrid API Key',
+    regex: /\b(SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43})\b/,
+    severity: 'critical',
+  },
+  {
+    name: 'Supabase Service Role Key',
+    regex: /\b(sbp_[a-zA-Z0-9]{30,})\b/,
+    severity: 'critical',
+  },
+  {
+    name: 'Vercel Access Token',
+    regex: /\b(vrl_[a-zA-Z0-9]{24,}|vercel_[a-zA-Z0-9]{24,})\b/,
+    severity: 'critical',
+  },
+  {
+    name: 'Database URL with Password',
+    regex: /(?:postgres(?:ql)?|mysql|mongodb(?:\+srv)?):\/\/[^\s:]+:([^@\s]+)@/i,
+    severity: 'high',
   },
   {
     name: 'Private RSA / SSH Key',
@@ -66,6 +86,9 @@ const SAFE_PLACEHOLDERS = [
   '<your',
   '{your',
   'replace_with',
+  'replace_me',
+  'insert_',
+  'my_secret',
 ];
 
 function isSafePlaceholder(val: string): boolean {

@@ -5,6 +5,7 @@ export function formatJsonReport(result: AuditResult): string {
     {
       summary: {
         healthScore: result.healthScore,
+        healthGrade: result.healthGrade,
         scannedEnvFilesCount: result.scannedEnvFiles.length,
         scannedCodeFilesCount: result.scannedCodeFilesCount,
         definedVariablesCount: result.definedVariables.length,
@@ -13,6 +14,9 @@ export function formatJsonReport(result: AuditResult): string {
         missingCount: result.missing.length,
         typeTrapsCount: result.typeTraps.length,
         secretLeaksCount: result.secretLeaks.length,
+        duplicatesCount: result.duplicates.length,
+        valueIssuesCount: result.valueIssues.length,
+        deprecationsCount: result.deprecations.length,
         executionTimeMs: result.executionTimeMs,
       },
       scannedEnvFiles: result.scannedEnvFiles,
@@ -36,6 +40,9 @@ export function formatJsonReport(result: AuditResult): string {
         files: z.filesDefined,
         suggestedAction: z.suggestedAction,
       })),
+      duplicates: result.duplicates,
+      valueIssues: result.valueIssues,
+      deprecations: result.deprecations,
     },
     null,
     2
