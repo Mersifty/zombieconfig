@@ -9,7 +9,7 @@ dist/
 build/
 *.tsbuildinfo
 
-# Environment & Local Overrides (preserve examples)
+# Environment & Local Overrides (preserve examples and fixtures)
 .env
 .env.local
 .env.development.local
@@ -18,6 +18,8 @@ build/
 !.env.example
 !.env.template
 !.env.sample
+!tests/fixtures/**/.env
+!tests/fixtures/**/.env*
 
 # Test Coverage
 coverage/
