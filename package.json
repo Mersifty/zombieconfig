@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "start": "tsx src/cli.ts",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --test tests/*.test.ts",
     "scan": "node ./bin/ghostconfig.js scan",
     "lint": "tsc --noEmit"
   },
